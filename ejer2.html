@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 2</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <form action="" id="formBusqueda">
+    <input type="id" id="id" required>
+    <button type="submit">Buscar</button>
+  </form>
+
+  <div id="animacion"></div>
+  <p></p>
+  <ul id="listaPlaneta"></ul>
+  <ul id="listaHabitantes"></ul>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const formulario = document.getElementById("formBusqueda")
+      const id = document.getElementById("id")
+      const animacion = document.getElementById("animacion")
+      const listaPlaneta = document.getElementById("listaPlaneta")
+      const listaHabitantes = document.getElementById("listaHabitantes")
+      const descripcion = document.querySelector("p")
+
+      function resetUI(){
+        descripcion.innerText = ""
+        listaPlaneta.innerHTML = ""
+        listaHabitantes.innerHTML = ""
+        animacion.removeAttribute("class")
+      }
+
+      formulario.addEventListener("submit", (e) => {
+        e.preventDefault() 
+
+        const idBuscado = parseInt(id.value)
+
+        if (idBuscado <= 0){
+          resetUI()
+          console.error('ID incorrecto')
+          return;
+        }
+
+        mostrarDatosPlaneta(idBuscado)
+      }) 
+
+      async function mostrarDatosPlaneta(id){
+
+        resetUI()
+        descripcion.innerText = "Cargando..."
+        animacion.setAttribute("class", "loader")
+
+        const URL = `https://swapi.dev/api/planets/${id}/`
+        const respuesta = await fetch(URL)
+
+        if (!respuesta.ok){
+          resetUI()
+          descripcion.innerText = "Planeta no encontrado"
+          return
+        }
+
+        const datos = await respuesta.json()
+        console.log(datos)
+
+        descripcion.innerText = ""
+        
+        const datosPlaneta = [
+            `Nombre: ${datos.name}`,
+            `Periodo de rotación: ${datos.rotation_period}`,
+            `Diámetro: ${datos.diameter}`,
+            `Gravedad: ${datos.gravity}`,
+            `Tipo de terreno: ${datos.terrain}`,
+            `Cantidad de habitantes: ${datos.population}`
+        ]
+
+        datosPlaneta.forEach(dato => {
+            const li = document.createElement("li")
+            li.innerHTML = dato
+            listaPlaneta.appendChild(li) 
+        })
+
+        listaResidentes.forEach(async (urlResidente) => {
+          const resp = await fetch(urlResidente)
+          const personaje = await resp.json()
+
+          const li = document.createElement("li")
+          li.innerHTML = personaje.name
+          listaHabitantes.appendChild(li) 
+        })
+
+        animacion.removeAttribute("class")
+      }
+
+    })
+  </script>
+
+</body>
+</html>

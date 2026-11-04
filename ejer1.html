@@ -1,11 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Ejercicio 1</title>
+  <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-  
+
+  <form action="" id="formBusqueda">
+    <input type="number" id="id" required>
+    <button type="submit">Buscar</button>
+  </form>
+
+  <div id="animacion"></div>
+  <p></p>
+  <input type="text" id="nombre" placeholder="Nombre">
+  <input type="text" id="estatura" placeholder="Estatura">
+  <input type="text" id="peso" placeholder="Peso">
+  <input type="text" id="cabello" placeholder="Color cabello">
+  <input type="text" id="genero" placeholder="Género">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Películas</th>
+        <th>Vehículos</th>
+        <th>Naves</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="peliculas"></td>
+        <td id="vehiculos"></td>
+        <td id="naves"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const formulario = document.getElementById("formBusqueda")
+      const id = document.getElementById("id")
+      const animacion = document.getElementById("animacion")
+      const nombre = document.getElementById("nombre")
+      const estatura = document.getElementById("estatura")
+      const peso = document.getElementById("peso")
+      const cabello = document.getElementById("cabello")
+      const genero = document.getElementById("genero")
+      const peliculas = document.getElementById("peliculas")
+      const vehiculos = document.getElementById("vehiculos")
+      const naves = document.getElementById("naves")
+      const descripcion = document.querySelector("p")
+
+      function resetUI(){
+        descripcion.innerText = ""
+        nombre.value = ""
+        estatura.value = ""
+        peso.value = ""
+        cabello.value = ""
+        genero.value = ""
+        peliculas.innerText = ""
+        vehiculos.innerText = ""
+        naves.innerText = ""
+        animacion.removeAttribute("class")
+      }
+
+      formulario.addEventListener("submit", (e) => {
+        e.preventDefault() 
+
+        const idBuscado = parseInt(id.value)
+
+        if (idBuscado <= 0){
+          resetUI()
+          console.error('ID incorrecto')
+          return;
+        }
+
+        mostrarDatosPersonaje(idBuscado)
+      }) 
+
+      async function mostrarDatosPersonaje(id){
+
+        resetUI()
+        descripcion.innerText = "Cargando..."
+        animacion.setAttribute("class", "loader")
+
+        const URL = `https://swapi.dev/api/people/${id}/`
+        const respuesta = await fetch(URL)
+
+        if (!respuesta.ok){
+          resetUI()
+          descripcion.innerText = "Personaje no encontrado"
+          return
+        }
+
+        const datos = await respuesta.json()
+        console.log(datos)
+
+        descripcion.innerText = ""
+        nombre.value = datos.name
+        estatura.value = datos.height
+        peso.value = datos.mass
+        cabello.value = datos.hair_color
+        genero.value = datos.gender
+
+        peliculas.innerText = datos.films.length
+        vehiculos.innerText = datos.vehicles.length
+        naves.innerText = datos.starships.length
+
+        animacion.removeAttribute("class")
+      }
+
+    })
+  </script>
+
 </body>
 </html>
